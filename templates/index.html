@@ -1,0 +1,176 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Home Price Prediction{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="m-0 font-weight-bold">
+                    <i class="fas fa-calculator me-2"></i>House Price Prediction
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+                
+                <form method="POST" action="/predict" class="needs-validation" novalidate>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <select class="form-select" id="state" name="state" required>
+                                <option value="" selected disabled>Select State</option>
+                                {% for state in states %}
+                                    <option value="{{ state }}">{{ state }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a state.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <select class="form-select" id="city" name="city" required disabled>
+                                <option value="" selected disabled>Select City</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a city.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3"><i class="fas fa-home me-2"></i>Property Details</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="bedrooms" class="form-label">Bedrooms</label>
+                            <input type="number" step="1 class="form-control" id="bedrooms" name="bedrooms" min="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="bathrooms" class="form-label">Bathrooms</label>
+                            <input type="number" step="1" class="form-control" id="bathrooms" name="bathrooms" min="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="floors" class="form-label">Floors</label>
+                            <input type="number" step="1" class="form-control" id="floors" name="floors" min="1" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="living_area" class="form-label">Living Area (sqft)</label>
+                            <input type="number" step="100" class="form-control" id="living_area" name="living_area" min="100" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lot_area" class="form-label">Lot Area (sqft)</label>
+                            <input type="number" step="100" class="form-control" id="lot_area" name="lot_area" min="100" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="house_area" class="form-label">House Area (excl. basement, sqft)</label>
+                            <input type="number" step="100" class="form-control" id="house_area" name="house_area" min="100" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="basement_area" class="form-label">Basement Area (sqft)</label>
+                            <input type="number" step="100" class="form-control" id="basement_area" name="basement_area" min="0" required>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3"><i class="fas fa-calendar-alt me-2"></i>Year Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="built_year" class="form-label">Built Year</label>
+                            <input type="number" class="form-control" id="built_year" name="built_year" min="1800" max="2025" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="renovation_year" class="form-label">Renovation Year (0 if none)</label>
+                            <input type="number" class="form-control" id="renovation_year" name="renovation_year" min="0" max="2025">
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3"><i class="fas fa-star me-2"></i>Quality & Features</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="condition" class="form-label">Condition (1-5)</label>
+                            <input type="number" class="form-control" id="condition" name="condition" min="1" max="5" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="grade" class="form-label">Grade (1-13)</label>
+                            <input type="number" class="form-control" id="grade" name="grade" min="1" max="13" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="views" class="form-label">Number of Views</label>
+                            <input type="number" class="form-control" id="views" name="views" min="0" required>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3"><i class="fas fa-map-marker-alt me-2"></i>Location Features</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="schools" class="form-label">Schools Nearby</label>
+                            <input type="number" class="form-control" id="schools" name="schools" min="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="airport_distance" class="form-label">Airport Distance (km)</label>
+                            <input type="number" step="0.1" class="form-control" id="airport_distance" name="airport_distance" min="0" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="waterfront" name="waterfront" value="1">
+                                <label class="form-check-label" for="waterfront">Waterfront Property</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            <i class="fas fa-calculator me-2"></i>Predict Price
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // State-City dynamic dropdown
+    $('#state').change(function() {
+        var state = $(this).val();
+        if (state) {
+            $.get('/get_cities/' + state, function(cities) {
+                $('#city').empty().append('<option value="" selected disabled>Select City</option>');
+                $.each(cities, function(i, city) {
+                    $('#city').append($('<option>').text(city).attr('value', city));
+                });
+                $('#city').prop('disabled', false);
+            });
+        } else {
+            $('#city').empty().append('<option value="" selected disabled>Select City</option>').prop('disabled', true);
+        }
+    });
+
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })();
+});
+</script>
+{% endblock %}
