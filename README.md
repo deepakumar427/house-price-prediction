@@ -54,7 +54,8 @@ A Flask web application that predicts housing prices across major Indian cities 
 2. Create and activate virtual environments:
    ```bash
    python -m venv env
-   venv\Scripts\activate   # For Windows
+   env\Scripts\activate   # For Windows
+   source env\bin\activate   # For Mac
 
 3. Install dependencies
    ```bash
